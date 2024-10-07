@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 };
-const drawerWidth = 340;
+
 
 
 export default function Home({
@@ -60,6 +60,7 @@ export default function Home({
               <DashboardWrapper mode = {dashMode} />
 
             </Box>
+            
 
         
         </Box>
