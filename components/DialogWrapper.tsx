@@ -15,15 +15,42 @@ export function DialogWrapper({ isOpen, onClose }: any) {
     const [startDate, setStartDate] = useState(""); 
     const [applicationDate,SetApplicationDate] = useState(dayjs()); 
 
-    const handleSubmit = (e: any) => {
-        
-    };
+    const handleSubmit = async (e :React.FormEvent) => {
+        e.preventDefault();
+        const jobData = {
+          companyName,
+          position,
+          startDate,
+          applicationDate: applicationDate ? applicationDate.toDate() : new Date(),
+        };
+        console.log(jobData)
+
+        try {
+            const response = await fetch('/api/jobs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jobData),
+            });
+
+            if (response.ok) {
+            const result = await response.json();
+            console.log('Job added:', result);
+            } else {
+            console.error('Error:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Request failed:', error);
+        }
+    }
 
     return (
-
+    <form onSubmit={handleSubmit}>
             <Dialog
                 disableAutoFocus
                 disableEnforceFocus
+                disablePortal
                 open={isOpen}
                 sx={{
                     '& .MuiPaper-root': {
@@ -105,12 +132,10 @@ export function DialogWrapper({ isOpen, onClose }: any) {
                                     label="Application Date"
                                     value = {applicationDate}
                                     onChange={(newValue) => {
-                                        if(null){
-                                            applicationDate
-                                        }
-                                        else{
+
+
                                             SetApplicationDate(dayjs(newValue))
-                                        }
+
                                     }}
 
                                     sx={{
@@ -148,7 +173,7 @@ export function DialogWrapper({ isOpen, onClose }: any) {
 
                 <DialogActions>
                     <Button
-                        onClick={handleSubmit}
+                        type='submit'
                         sx={{
                             color: blue[200],
                             '&:hover': { backgroundColor: blue[400], color: grey[900] },
@@ -168,6 +193,7 @@ export function DialogWrapper({ isOpen, onClose }: any) {
                     </Button>
                 </DialogActions>
             </Dialog>
+        </form>
 
     );
 }
