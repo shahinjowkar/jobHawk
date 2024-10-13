@@ -8,7 +8,7 @@ export default function Jobs({jobs} : any){
         {jobs.map((job: any) => (
             <ListItem key={job.id} divider>
             <ListItemText
-                primary={job.companyName} // Display job title
+                primary={job.companyName} 
             />
             </ListItem>
         ))}

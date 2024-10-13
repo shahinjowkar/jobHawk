@@ -8,13 +8,63 @@ import { Box, TextField, Button, Dialog, DialogActions, DialogContent, DialogCon
 import { grey, blue } from '@mui/material/colors';
 import { useState } from 'react';
 import dayjs from 'dayjs'; 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+async function postJob(jobData: any): Promise<any> {
+    try {
+      const response = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jobData),
+      });
+  
+      if (!response.ok) {
+
+        const error = `Error: ${response.statusText}`;
+        throw error
+
+      }
+  
+
+      const result = await response.json();
+      console.log('Job added:', result);
+      return result;
+  
+    } catch (error) {
+
+      console.error('Request failed:', error);
+      throw error; 
+    }
+}
+
+// The mutation hook
+const useAddJobMutation = () : any=> {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn:postJob,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['jobs'] });
+        },
+        onError: (error: any) => {
+            console.error('Error adding job:', error);
+        },
+
+    })
+};
+
 
 export function DialogWrapper({ isOpen, onClose }: any) {
     const [companyName, SetCompanyName] = useState("");
     const [position, SetPosition] = useState("");
     const [startDate, setStartDate] = useState(""); 
     const [applicationDate,SetApplicationDate] = useState(dayjs()); 
-
+    //add the isPending and etc later
+    const { mutate, isPending, isError } = useAddJobMutation();
+ 
+ 
     const handleSubmit = async (e :React.FormEvent) => {
         e.preventDefault();
         const jobData = {
@@ -24,25 +74,7 @@ export function DialogWrapper({ isOpen, onClose }: any) {
           applicationDate: applicationDate ? applicationDate.toDate() : new Date(),
         };
         console.log(jobData)
-
-        try {
-            const response = await fetch('/api/jobs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(jobData),
-            });
-
-            if (response.ok) {
-            const result = await response.json();
-            console.log('Job added:', result);
-            } else {
-            console.error('Error:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Request failed:', error);
-        }
+        mutate(jobData); 
     }
 
     return (

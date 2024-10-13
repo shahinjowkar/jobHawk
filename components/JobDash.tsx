@@ -6,7 +6,7 @@ import { blue } from '@mui/material/colors';
 import { DialogWrapper } from './DialogWrapper';
 import { useQuery } from '@tanstack/react-query';
 import Jobs from './Jobs';
-// Fetching jobs function
+
 async function fetchJobs() {
     const res = await fetch('/api/jobs');
     if (!res.ok) {
@@ -14,6 +14,8 @@ async function fetchJobs() {
     }
     return res.json();
 }
+
+
 
 export default function JobDash() {
   const [isDialog, SetIsDialog] = useState(false)
