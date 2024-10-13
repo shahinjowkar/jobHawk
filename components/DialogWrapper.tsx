@@ -174,6 +174,7 @@ export function DialogWrapper({ isOpen, onClose }: any) {
                 <DialogActions>
                     <Button
                         type='submit'
+                        onClick={onClose}
                         sx={{
                             color: blue[200],
                             '&:hover': { backgroundColor: blue[400], color: grey[900] },

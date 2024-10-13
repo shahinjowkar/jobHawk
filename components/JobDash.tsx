@@ -1,14 +1,27 @@
 import React from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, TextField } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, List, ListItem, ListItemText, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useState } from 'react';
 import { blue } from '@mui/material/colors';
 import { DialogWrapper } from './DialogWrapper';
-
+import { useQuery } from '@tanstack/react-query';
+import Jobs from './Jobs';
+// Fetching jobs function
+async function fetchJobs() {
+    const res = await fetch('/api/jobs');
+    if (!res.ok) {
+      throw new Error('Failed to fetch jobs');
+    }
+    return res.json();
+}
 
 export default function JobDash() {
   const [isDialog, SetIsDialog] = useState(false)
+  const { data, error, isLoading } = useQuery({ queryKey: ['jobs'], queryFn: fetchJobs })
 
+  if (isLoading) return <p>Loading jobs...</p>;
+  if (error) return <p>Error loading jobs: {error.message}</p>;
+  console.log(data)  
   return (
     <React.Fragment>
         <Box
@@ -23,7 +36,6 @@ export default function JobDash() {
         <Box
         sx={{
             height: "60px", 
-            // border: '2px solid #FFF',  // White border for visibility
             display: "flex",
             justifyContent:"end",
             alignItems:"center"
@@ -42,7 +54,6 @@ export default function JobDash() {
             >
                 <AddIcon />
             </Fab>
-            
         </Box>
 
         <Box
@@ -51,8 +62,9 @@ export default function JobDash() {
             
         }}
         >
-  
-            </Box>
+
+        <Jobs jobs={data} />
+        </Box>
         </Box>
         <DialogWrapper isOpen={isDialog} onClose={() => SetIsDialog(false)} />
 
