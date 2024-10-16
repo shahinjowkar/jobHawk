@@ -4,14 +4,17 @@ import AddIcon from '@mui/icons-material/Add';
 import { useState } from 'react';
 import { blue } from '@mui/material/colors';
 import { DialogWrapper } from './DialogWrapper';
-import { useQuery } from '@tanstack/react-query';
+import { Query, QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import Jobs from './Jobs';
 
 async function fetchJobs() {
+
     const res = await fetch('/api/jobs');
     if (!res.ok) {
       throw new Error('Failed to fetch jobs');
     }
+
     return res.json();
 }
 
@@ -19,7 +22,17 @@ async function fetchJobs() {
 
 export default function JobDash() {
   const [isDialog, SetIsDialog] = useState(false)
-  const { data, error, isLoading } = useQuery({ queryKey: ['jobs'], queryFn: fetchJobs })
+  const queryClient = useQueryClient()
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['jobs'],
+    queryFn: async () => {
+        const fetchedJobs = await fetchJobs();
+        fetchedJobs.forEach((job: any) => {
+          queryClient.setQueryData(['job', job._id], job);  // Cache each job individually
+        });
+        return fetchedJobs;
+    },
+  });
 
   if (isLoading) return <p>Loading jobs...</p>;
   if (error) return <p>Error loading jobs: {error.message}</p>;
@@ -61,6 +74,8 @@ export default function JobDash() {
         <Box
         sx={{
             flexGrow: 1,  
+            overflowY: 'auto',
+            height: '600px',
             
         }}
         >

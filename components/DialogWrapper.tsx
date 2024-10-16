@@ -9,6 +9,7 @@ import { grey, blue } from '@mui/material/colors';
 import { useState } from 'react';
 import dayjs from 'dayjs'; 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {Status} from "../lib/enum"
 
 async function postJob(jobData: any): Promise<any> {
     try {
@@ -72,6 +73,7 @@ export function DialogWrapper({ isOpen, onClose }: any) {
           position,
           startDate,
           applicationDate: applicationDate ? applicationDate.toDate() : new Date(),
+          status: Status.SELECT
         };
         console.log(jobData)
         mutate(jobData); 
